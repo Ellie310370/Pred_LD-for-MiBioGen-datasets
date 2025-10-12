@@ -2,7 +2,7 @@
 #===========================================================
 #  PRED-LD imputation — PBS array job (1 task = 1 trait)
 #  Avoids collisions by running each task in its own WORK dir,
-#  then renames + collects outputs into a shared results/ folder.
+#  then renames + collects outputs into a shared folder.
 #===========================================================
 
 # PBS
