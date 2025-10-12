@@ -1,0 +1,114 @@
+#!/bin/bash
+#===========================================================
+#  PRED-LD imputation — PBS array job (1 task = 1 trait)
+#  Avoids collisions by running each task in its own WORK dir,
+#  then renames + collects outputs into a shared results/ folder.
+#===========================================================
+
+# PBS
+#PBS -N pred-ld_array_MiBioGen
+#PBS -o pred-ld_array_MiBioGen.out
+#PBS -e pred-ld_array_MiBioGen.err
+#PBS -l select=1:ncpus=1:mem=128gb
+#PBS -l walltime=24:00:00
+#PBS -J 1-190
+
+set -euo pipefail
+export OMP_NUM_THREADS=1
+
+#  set the paths
+LIST="/home/n11385332/Pred_LD/MiBioGen.predld.inputs.txt"  # one input file per line (*.PREDLD.txt)
+OUTDIR="/home/n11385332/Pred_LD/out.MiBioGen.Pred-LD"      # final collected outputs
+LOGDIR="${OUTDIR}/logs"                                    # per-task logs
+PREDLD_SRC="/home/n11385332/Pred_LD/PRED-LD"               # folder containing pred_ld.py
+VENV="$HOME/predld-venv/bin/activate"                      # the Python venv to run pred_ld.py
+
+# Create output/log dirs
+mkdir -p "$OUTDIR" "$LOGDIR"
+
+# Which input for this array index?
+INDEX="$PBS_ARRAY_INDEX"
+INFILE="$(sed -n "${INDEX}p" "$LIST")"
+BASE="$(basename "$INFILE" .PREDLD.txt)"   # trait basename, used to prefix outputs
+
+# Per-task logs (simple)
+exec > "${LOGDIR}/${BASE}.predld.out"
+exec 2> "${LOGDIR}/${BASE}.predld.err"
+
+
+# These two lines will tell us exactly which taxa (i.e., BASE) is running for which array index:
+echo "[INFO] $(date) INDEX=${INDEX} BASE=${BASE}"
+echo "[INFO] INFILE=${INFILE}"
+
+#  Isolated working directory 
+# Each array task uses its own folder; prevents filename collisions.
+WORK="${OUTDIR}/${BASE}"
+mkdir -p "$WORK"
+echo "[INFO] OUT=${WORK}"
+cd "$WORK"
+
+
+# NOTE: pred_ld.py writes fixed filenames like:
+#   imputation_results_chr_all.txt
+#   imputation_results_chr1.txt 
+# Because we run in a unique WORK dir, nothing collides.
+
+# But we still need to do something regarding --ref; otherwise I’ll get an error like:
+# FileNotFoundError: [Errno 2] No such file or directory: 
+# '/mnt/hpccs01/home/n11385332/Pred_LD/out.MiBioGen.Pred-LD/genus.Ruminiclostridium6.id.11356/ref/TOP_LD/EUR/SNV/EUR_chr1_no_filter_0.2_1000000_info_annotation.csv.gz' 
+# To fix that, I add this line:
+ln -sfn /home/n11385332/Pred_LD/PRED-LD/ref ref
+
+# ln = the Unix command to make a link to a file or folder.
+# Symbolic link: If the target moves or is deleted, the symlink becomes broken.
+# Hard link: If you delete one name, the other still has the data.
+
+# more about symlink:
+# A symlink (symbolic link) is a tiny file that points to another file or folder by path. 
+# Think of it like a desktop shortcut:
+# When you open/read the symlink, the OS transparently follows it to the target.
+# If the target changes, you see the change through the symlink too.
+# If the target is moved/deleted, the symlink becomes broken (it points nowhere).
+# -s = make a symlink
+# -f: replace an existing file or symlink at the destination name.
+# -n: if the destination is a symlink to a directory, treat it as a file to replace (don’t descend into it). Handy when recreating ref links.
+# -f and -n are handy especially when: 
+# rerun this script for the same trait (e.g., resubmit the array, retry after a failure),
+
+
+# Run pred_ld.py inside WORK
+source "$VENV"
+# stay in WORK; call pred_ld.py by full path
+python "${PREDLD_SRC}/pred_ld.py" \
+  --file-path "$INFILE" \
+  --r2threshold 0.8 \
+  --pop EUR \
+  --maf 0.01 \
+  --ref TOP_LD
+
+# No collect/rename needed
+# Files like imputation_results_chr10.txt now live in:
+# $OUTDIR/$BASE/imputation_results_chr10.txt
+
+echo "[INFO] Done ${BASE}  (outputs in $WORK)"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
