@@ -1,8 +1,7 @@
 #!/bin/bash
 #===========================================================
 #  PRED-LD imputation — PBS array job (1 task = 1 trait)
-#  Avoids collisions by running each task in its own WORK dir,
-#  then renames + collects outputs into a shared folder.
+#  Avoids collisions by running each task in its own WORK dir
 #===========================================================
 
 # PBS
@@ -86,7 +85,6 @@ python "${PREDLD_SRC}/pred_ld.py" \
   --maf 0.01 \
   --ref TOP_LD
 
-# No collect/rename needed
 # Files like imputation_results_chr10.txt now live in:
 # $OUTDIR/$BASE/imputation_results_chr10.txt
 
