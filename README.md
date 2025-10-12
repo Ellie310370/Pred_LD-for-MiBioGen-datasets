@@ -10,8 +10,5 @@ imputation_results_chr12.txt  imputation_results_chr16.txt  imputation_results_c
 imputation_results_chr13.txt  imputation_results_chr17.txt  imputation_results_chr20.txt  imputation_results_chr3.txt   imputation_results_chr7.txt
 
 If you run many traits in one directory, later runs will overwrite earlier ones.
-Here, I provide a PBS array that isolates each task's working directory and then renames/collects the results.
+This PBS array isolates each task in its own per-trait folder, so every job writes to a unique place and collisions are impossible.
 
-My idea is:
-Run each array task in its own work folder (so identical filenames don't collide).
-After pred_ld.py finishes, rename outputs with the trait's basename and move them to a shared results directory.
