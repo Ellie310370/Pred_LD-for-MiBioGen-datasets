@@ -1,6 +1,5 @@
 # Pred_LD for MiBioGen datasets
-Use Pred_LD to impute a large number of traits without overwriting outputs.
-
+Here I show how I used Pred_LD (https://github.com/pbagos/PRED-LD) to impute a large number of traits without overwriting outputs.
 Pred_LD does not accept an output prefix/dir argument. It always writes files like:
 
 [n11385332@aquarius01 PRED-LD]$ ls imputation*.txt
