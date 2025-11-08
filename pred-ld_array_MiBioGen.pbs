@@ -5,22 +5,22 @@
 #===========================================================
 
 # PBS
-#PBS -N pred-ld_array_MiBioGen
-#PBS -o pred-ld_array_MiBioGen.out
-#PBS -e pred-ld_array_MiBioGen.err
-#PBS -l select=1:ncpus=1:mem=128gb
-#PBS -l walltime=24:00:00
+#PBS -N pred-ld_array_MiBioGen.grch38.rsIDonly
+#PBS -o pred-ld_array_MiBioGen.grch38.rsIDonly.out
+#PBS -e pred-ld_array_MiBioGen.grch38.rsIDonly.err
+#PBS -l select=1:ncpus=1:mem=64gb
+#PBS -l walltime=48:00:00
 #PBS -J 1-190
 
 set -euo pipefail
 export OMP_NUM_THREADS=1
 
 #  set the paths
-LIST="/home/n11385332/Pred_LD/MiBioGen.predld.inputs.txt"  # one input file per line (*.PREDLD.txt)
-OUTDIR="/home/n11385332/Pred_LD/out.MiBioGen.Pred-LD"      # final collected outputs
-LOGDIR="${OUTDIR}/logs"                                    # per-task logs
-PREDLD_SRC="/home/n11385332/Pred_LD/PRED-LD"               # folder containing pred_ld.py
-VENV="$HOME/predld-venv/bin/activate"                      # the Python venv to run pred_ld.py
+LIST="/home/n11385332/Pred_LD/MiBioGen.predld.inputs.grch38.rsIDonly.txt"  # one input file per line (*.PREDLD.txt)
+OUTDIR="/home/n11385332/Pred_LD/predld_results_grch38"                     # final collected outputs
+LOGDIR="${OUTDIR}/logs"                                                    # per-task logs
+PREDLD_SRC="/home/n11385332/Pred_LD/PRED-LD"                               # folder containing pred_ld.py
+VENV="$HOME/predld-venv/bin/activate"                                      # the Python venv to run pred_ld.py
 
 # Create output/log dirs
 mkdir -p "$OUTDIR" "$LOGDIR"
@@ -89,24 +89,3 @@ python "${PREDLD_SRC}/pred_ld.py" \
 # $OUTDIR/$BASE/imputation_results_chr10.txt
 
 echo "[INFO] Done ${BASE}  (outputs in $WORK)"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
