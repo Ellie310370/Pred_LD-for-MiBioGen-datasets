@@ -11,5 +11,7 @@ imputation_results_chr13.txt  imputation_results_chr17.txt  imputation_results_c
 If you run many traits in one directory, later runs will overwrite earlier ones.
 This PBS array (pred-ld_array_MiBioGen.pbs) isolates each task in its own per-trait folder, so every job writes to a unique place and collisions are impossible.
 Then I needed to rename the output files according to the name of each taxon (which corresponds to the subfolder names in the output directory):
+
 for d in */; do cp "${d}imputation_results_chr_all.txt" "${d%/}_predLD.imputed.txt"; done
+
 So, now I have all the files renamed in the output directory!
